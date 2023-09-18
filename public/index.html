@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <title>ChatBot</title>
+  <!-- MDB icon -->
+  <link rel="icon" href="img/logo.ico" type="image/x-icon" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" />
+  <!-- Google Fonts Roboto -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" />
+  <!-- MDB -->
+  <link rel="stylesheet" href="css/bootstrap-chat.min.css" />
+  <link href="style.css" rel="stylesheet">
+  <script src='responsivevoice.js'></script>
+</head>
+
+<body>
+  <!-- Start your project here-->
+  <section style="background-color: #eee;">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0">
+          <h5 class="font-weight-bold mb-3 text-center text-lg-start">Layanan</h5>
+          <div class="card">
+            <div class="card-body">
+              <ul id="chat" class="list-unstyled mb-0">
+                <li id="chatColorGPT" class="p-2 border-bottom" style="background-color: #eee;">
+                  <a href="#" onclick="showChat('chatgpt')" class="d-flex justify-content-between">
+                    <div class="d-flex flex-row">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/768px-ChatGPT_logo.svg.png?20230318122128"
+                        alt="avatar" class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="60">
+                      <div class="pt-1">
+                        <p class="fw-bold mb-0">ChatGPT</p>
+                        <p class="small text-muted">Asisten AI language model</p>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <li id="chatColorSdiff" class="p-2 border-bottom">
+                  <a href="#" onclick="showChat('stablediffusion')" class="d-flex justify-content-between">
+                    <div class="d-flex flex-row">
+                      <img
+                        src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/yaun2ev6hp27dz6lkhjv"
+                        alt="avatar" class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="60">
+                      <div class="pt-1">
+                        <p class="fw-bold mb-0">Stable Diffusion</p>
+                        <p class="small text-muted">Generate gambar dengan AI</p>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-7 col-xl-8">
+          <div class="container">
+            <h5 id="heading" class="font-weight-bold mb-4 text-center text-lg-start ">ChatGPT</h5>
+            <ul id="outputTanya" class="list-unstyled scrollable-ul">
+              <div id="myModal" class="modal">
+                <span class="close">&times;</span>
+                <img class="modal-content" id="img01">
+                <div id="caption"></div>
+              </div>
+              <!-- <li class="d-flex justify-content-start mb-4">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp" alt="avatar"
+                  class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
+                <div class="card">
+                  <div class="card-header d-flex justify-content-between p-3">
+                    <p class="fw-bold mb-0" style="margin-right: 10px;">ChatGPT</p>
+                    <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-0">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil voluptas neque temporibus magni
+                      minima repudiandae quia. Dolores distinctio velit optio, cupiditate dignissimos nihil ex cum nemo
+                      necessitatibus? Aliquam, ratione quam.
+                    </p>
+                  </div>
+                </div>
+              </li>
+              <li class="d-flex justify-content-start mb-4">
+                <div class="card">
+                  <div class="card-header d-flex justify-content-between p-3">
+                    <p class="fw-bold mb-0" style="margin-right: 10px;">ChatGPT</p>
+                    <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
+                  </div>
+                  <div class="card-body">
+                    <img id="myImg"
+                      src="data:image/jpeg;base64,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"
+                      alt="gambar" class="img-fluid">
+                  </div>
+                </div>
+              </li> -->
+              <!-- <li class="d-flex justify-content-end mb-4">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between p-3">
+                  <p class="fw-bold mb-0" style="margin-right: 10px; text-align: right;">Lara Croft</p>
+                  <p class="text-muted small mb-0"><i class="far fa-clock"></i> 13 mins ago</p>
+                </div>
+                <div class="card-body text-end">
+                  <p class="mb-0">
+                    Sed ut.
+                  </p>
+                </div>
+              </div> -->
+              <!-- <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp" alt="avatar"
+                class="rounded-circle d-flex align-self-start ms-3 shadow-1-strong" width="60">
+            </li> -->
+
+            </ul>
+            <ul style="list-style: none;">
+              <li style="margin-left: -30px;" class="bg-white mb-3">
+                <div class="form-outline">
+                  <textarea id="inputUser" class="form-control" rows="4"></textarea>
+                  <label id="label" class="form-label" for="textAreaExample2">Masukkan teks...</label>
+                </div>
+              </li>
+              <button id="sendButton" onclick="processUserInput()" type="button"
+                class="btn btn-info btn-rounded float-end">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z" />
+                </svg>
+              </button>
+              <button id="micButton" style="margin-right: 10px;" type="button"
+                class="btn btn-info btn-rounded float-end">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
+                  <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z" />
+                </svg>
+              </button>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- End your project here-->
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+  <!-- MDB -->
+  <script type="text/javascript" src="js/mdb.min.js"></script>
+  <!-- Custom scripts -->
+  <script src="kirim.js"></script>
+  <script src="speechtotext.js"></script>
+</body>
+</html>
